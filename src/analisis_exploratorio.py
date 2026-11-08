@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -40,6 +41,44 @@ def realizar_eda(ruta_csv):
 
     return df
 
+def generar_graficos(df, carpeta_salida='reports/figures'):
+    """
+    Crea y guarda visualizaciones estadisticas en la carpeta de reportes.
+    """
+    os.makedirs(carpeta_salida, exist_ok=True)
+    sns.set_theme(style='whitegrid')
+
+    # 1. Distribucion de edades
+    plt.figure(figsize=(8, 5))
+    sns.histplot(df['edad'], kde=True, color='skyblue', bins=10)
+    plt.title('Distribucion de Edades', fontsize=14)
+    plt.xlabel('Edad')
+    plt.ylabel('Frecuencia')
+    ruta_hist = os.path.join(carpeta_salida, 'distribucion_edad.png')
+    plt.savefig(ruta_hist, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"\n[Grafico guardado] -> {ruta_hist}")
+
+    # 2. Relacion Ingresos vs Edad segmentado por Satisfaccion
+    plt.figure(figsize=(9, 6))
+    sns.scatterplot(
+        data=df,
+        x='edad',
+        y='ingresos',
+        hue='satisfaccion',
+        palette='viridis',
+        s=80
+    )
+    plt.title('Relacion entre Ingresos y Edad segun Nivel de Satisfaccion', fontsize=14)
+    plt.xlabel('Edad')
+    plt.ylabel('Ingresos ($)')
+    ruta_scatter = os.path.join(carpeta_salida, 'ingresos_vs_edad.png')
+    plt.savefig(ruta_scatter, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"[Grafico guardado] -> {ruta_scatter}")
+
 if __name__ == '__main__':
     ruta_datos = 'data/raw/dataset.csv'
     dataset = realizar_eda(ruta_datos)
+    generar_graficos(dataset)
+    
